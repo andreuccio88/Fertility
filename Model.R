@@ -60,7 +60,7 @@ mac_mse <- function(y_test,test_predictions,ages){
 
 
 wlse_wrapper <- custom_metric("mac_mse", function(y_test,test_predictions) {
-  mac_mse(y_test,test_predictions, ages=ages)})
+  mac_mse(y_test,test_predictions)})
 
 
 
