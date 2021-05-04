@@ -36,28 +36,32 @@
 # DATA
 # 
 
+library(keras)
 # Function
 
 mac_mse <- function(y_test,test_predictions,ages){
-  K        <- backend()
-  ages  <- K$variable(ages)
   
-  l <- K$variable(dim(y_test)[1])
-  
-  mac_obs <-K$variable( rep(NA,l))
-  mac_nn <- K$variable(rep(NA,l))
+  ages  <- (ages)
+  l <- (dim(y_test)[1])
+  mac_obs <-( rep(NA,l))
+  mac_nn <- (rep(NA,l))
   
   for (i in 1:l) {
     
     mac_obs[i] <- sum(sum( as.numeric((ages*(y_test[i,])*100)))/sum(as.numeric((y_test[i,])*100)))
-    
     mac_nn[i]<- sum(sum( as.numeric((ages*(test_predictions[i,])*100)))/sum(as.numeric((test_predictions[i,])*100)))
   }
   
+  K   <- backend()
   # calculate the metric
   loss <- K$sum((K$pow(mac_obs - mac_nn, 2))) 
   return(loss)
 }
+
+
+wlse_wrapper <- custom_metric("mac_mse", function(y_test,test_predictions) {
+  mac_mse(y_test,test_predictions, ages=ages)})
+
 
 
 # Error functions 
@@ -168,7 +172,7 @@ for (g in 1:(nrow(tuning))){
       layer_dense(units = 36,activation = "sigmoid")
     
     model %>% compile(
-      loss = mac_mse,
+      loss = wlse_wrapper,
       optimizer = optimizer_rmsprop(), 
       metrics = list("mean_absolute_error"))
     
